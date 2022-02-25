@@ -45,21 +45,103 @@ exports.getProfile = async (req, res) => {
     // if (typeof req.body._id != "undefined") delete req.body._id;
     // if (typeof req.body.createdAt != "undefined") delete req.body.createdAt;
     // if (typeof req.body.updatedAt != "undefined") delete req.body.updatedAT;
-    const user_profile = await User_profile.find({ user_id: req.body.email });
+    const userProfile = await User_profile.find({ user_id: req.body.email });
     // const user_profile = new User_profile(); //get an instance of the model and populate it with data coming from request, which is everything in document
+    const codeMaker = await Code_maker.find({ user_id: req.body.email });
 
-    res.json(user_profile);
+    const followers = await User_profile.count(
+      { following: req.body.email }
+    );
+
+    res.json({
+      userProfile: userProfile[0],
+      recentProjects: codeMaker,
+      followers: followers,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
   }
 };
 
+exports.getFollowing = async (req, res) => {
+  try {
+    // if (typeof req.body._id != "undefined") delete req.body._id;
+    // if (typeof req.body.createdAt != "undefined") delete req.body.createdAt;
+    // if (typeof req.body.updatedAt != "undefined") delete req.body.updatedAT;
+    const following = await User_profile.find(
+      { user_id: req.body.email },
+      { user_id: 1, following: 1 }
+    );
+    // const user_profile = new User_profile(); //get an instance of the model and populate it with data coming from request, which is everything in document
+    // if (following = 'undef')
+    const list = await User_profile.find(
+      { user_id: { $in: following[0].following } },
+      { name: 1, profile_pic: 1, user_id: 1 }
+    );
+
+    //const followers = await User_profile.find({ followings: req.body.email },{user_id:1,given_name:1, profile_pic:1});
+
+    res.json({
+      uniqueID: following[0]._id,
+      user_id: following.user_id,
+      list: list,
+    });
+    console.log(following);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
+
+exports.getFollowers = async (req, res) => {
+  try {
+    const newList=[];
+    const userProfile = await User_profile.find(
+      { user_id: req.body.email} ,
+      { name: 1,following:1 }
+    );
+    const list = await User_profile.find(
+      { following: req.body.email },
+      { name: 1, profile_pic: 1, user_id: 1 }
+    );
+
+    list.forEach((element) => {
+    if (userProfile[0].following.includes(element.user_id)) 
+    {
+    console.log(element.user_id)
+       element.following = 1 ;
+    }
+    else 
+    {
+           element.following =0;
+           console.log ("no match")
+    }
+    newList.push(element);
+    console.log(element);
+    }
+  );
+
+    //const followers = await User_profile.find({ followings: req.body.email },{user_id:1,given_name:1, profile_pic:1});
+
+    res.json({
+      uniqueID: userProfile[0]._id,
+      list: newList,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
+
+
+
+
 exports.updateFollowing = async (req, res) => {
   try {
-    const user_profile = await User_profile.findById(req.body._id); //you have to get an instance of the model, aka a document, basically one user, when you create an instance, you have data to use, we are querying data to get an instance
-    user_profile.name = req.body.name; //the document for that specific user
-    user_profile.following = req.body.following;
+    const user_profile = await User_profile.findById(req.body.uniqueID); //you have to get an instance of the model, aka a document, basically one user, when you create an instance, you have data to use, we are querying data to get an instance
+    //user_profile.name = req.body.name; //the document for that specific user
+    user_profile.following = req.body.list;
     await user_profile.save();
     res.json(user_profile);
   } catch (error) {
@@ -68,6 +150,22 @@ exports.updateFollowing = async (req, res) => {
   }
 };
 
+exports.followUser = async (req, res) => {
+  try {
+    const user_profile = await User_profile.findById(req.body.uniqueID); //you have to get an instance of the model, aka a document, basically one user, when you create an instance, you have data to use, we are querying data to get an instance
+    //user_profile.name = req.body.name; //the document for that specific user
+    if (user_profile.following.includes(req.body.userID))
+    ;
+    else
+     user_profile.following.push(req.body.userID);
+    await user_profile.save();
+    res.json(user_profile);
+    console.log(req.body.userID)
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
 exports.updateProfile = async (req, res) => {
   try {
     const user_profile = await User_profile.findById(req.body._id);
@@ -105,22 +203,22 @@ exports.createCode = async (req, res) => {
 //     } catch (error) {
 //         console.log(error)
 
-exports.updateProfile = async (req, res) => {
-  try {
-    const user_profile = await User_profile.findById(req.body._id);
-    user_profile.name = req.body.name;
-    user_profile.user_id = req.body.user_id;
-    user_profile.profile_pic = req.body.profile_pic;
-    user_profile.description = req.body.description;
-    user_profile.darkmode = req.body.darkmode;
-    user_profile;
-    await user_profile.save();
-    res.json(user_profile);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
-  }
-};
+//   exports.updateProfile = async (req, res) => {
+//     try {
+//       const user_profile = await User_profile.findById(req.body._id);
+//       user_profile.name = req.body.name;
+//       user_profile.user_id = req.body.user_id;
+//       user_profile.profile_pic = req.body.profile_pic;
+//       user_profile.description = req.body.description;
+//       user_profile.darkmode = req.body.darkmode;
+//       user_profile
+//       await user_profile.save();
+//       res.json(user_profile);
+//     } catch (error) {
+//       console.log(error);
+//       res.status(500).json(error);
+//     }
+// }
 
 exports.createCode = async (req, res) => {
   try {
