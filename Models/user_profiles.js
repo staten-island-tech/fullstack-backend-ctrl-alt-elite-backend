@@ -10,28 +10,34 @@ const user_profileSchema = new mongoose.Schema(
     user_id: {
       type: String,
       trim: true,
+      rquired:"Please enter a your email"
     },
     given_name: {
       type: String,
       trim: true,
+      default: "",
     },
     family_name: {
       type: String,
       trim: true,
+      default: "",
     },
     nickname: {
       type: String,
       trim: true,
+      default: "",
     },
     profile_pic: {
       type: String,
       trim: true,
+      default: "",
     },
     description: {
       type: String,
       trim: true,
+      default: "",
     },
-    following: [{ type: String, trim: true }],
+    following: [{ type: String, trim: true },],
     dark_mode: {
       type: Boolean,
       default: true,
