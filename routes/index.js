@@ -17,4 +17,5 @@ router.post("/unFollow", controller.unFollow);
 router.post("/follow", controller.follow);
 router.post("/getFollowInfo", controller.getFollowInfo);
 router.post("/getInfo", controller.getInfo);
+router.post("/searchProjects", controller.searchProjects);
 module.exports = router;
