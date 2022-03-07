@@ -21,18 +21,17 @@ exports.homePage = async (req, res) => {
   }
 };
 
-
 exports.getProjects = async (req, res) => {
- //  modify to use parameters to limit the list to most recent 
+  //  modify to use parameters to limit the list to most recent
   try {
-     const codeMaker = await Code_maker.aggregate([
-      { $match: { user_id: req.body.userID} },
-      { $sort: { "private_code.updatedAt": -1 } }
+    const codeMaker = await Code_maker.aggregate([
+      { $match: { user_id: req.body.userID } },
+      { $sort: { "private_code.updatedAt": -1 } },
       // { $limit: 3 },
     ]);
 
     res.json({ projects: codeMaker });
-    console.log(codeMaker)
+    console.log(codeMaker);
   } catch (error) {
     console.log(error);
   }
@@ -40,14 +39,13 @@ exports.getProjects = async (req, res) => {
 
 exports.createUser = async (req, res) => {
   try {
-    
-    const user_profile = new User_profile();  
+    const user_profile = new User_profile();
     user_profile.user_id = req.body.email;
     user_profile.name = req.body.name;
     user_profile.given_name = req.body.given_name;
     user_profile.profile_pic = req.body.picture;
     user_profile.nickname = req.body.nickname;
-    
+
     await user_profile.save();
     res.json(user_profile);
   } catch (error) {
@@ -56,16 +54,27 @@ exports.createUser = async (req, res) => {
   }
 };
 
+exports.createProject = async (req, res) => {
+  try {
+    const project = new Code_maker();
+    project.project_title = req.body.project_title;
+    project.user_id = req.body.email;
+    project.description = req.body.description;
+    project.published_code = req.body.published_code;
+    await project.save();
+    res.json(profile);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
+
 exports.getProfile = async (req, res) => {
   try {
-    
     const userProfile = await User_profile.find({ user_id: req.body.email });
-    if(userProfile.length === 0)
-      throw ("Error : user already exists")
-    
-    const followers = await User_profile.count(
-      { following: req.body.email }
-    );
+    if (userProfile.length === 0) throw "Error : user already exists";
+
+    const followers = await User_profile.count({ following: req.body.email });
 
     res.json({
       userProfile: userProfile[0],
@@ -88,14 +97,11 @@ exports.getFollowing = async (req, res) => {
       { name: 1, profile_pic: 1, user_id: 1 }
     );
 
-     
-
     res.json({
       uniqueID: following[0]._id,
       user_id: following.user_id,
       list: list,
     });
-    
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -104,13 +110,11 @@ exports.getFollowing = async (req, res) => {
 
 exports.getFollowers = async (req, res) => {
   try {
-
-
     const list = await User_profile.find(
       { following: req.body.email },
       { name: 1, profile_pic: 1, user_id: 1 }
     );
-    
+
     res.json({
       list: list,
     });
@@ -119,9 +123,6 @@ exports.getFollowers = async (req, res) => {
     res.status(500).json(error);
   }
 };
-
-
-
 
 // exports.updateFollowing = async (req, res) => {
 //   try {
@@ -137,14 +138,14 @@ exports.getFollowers = async (req, res) => {
 
 exports.unFollow = async (req, res) => {
   try {
-    let userProfile = await User_profile.find({user_id:req.body.userID});
-     userProfile = await User_profile.findById(userProfile[0]._id);  
+    let userProfile = await User_profile.find({ user_id: req.body.userID });
+    userProfile = await User_profile.findById(userProfile[0]._id);
     userProfile.following = userProfile.following.filter(
       (item) => item != req.body.unfollowUserID
     );
     await userProfile.save();
     res.json(userProfile);
-    console.log(userProfile)
+    console.log(userProfile);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -154,7 +155,7 @@ exports.unFollow = async (req, res) => {
 exports.follow = async (req, res) => {
   try {
     let userProfile = await User_profile.find({ user_id: req.body.userID });
-    userProfile = await User_profile.findById(userProfile[0]._id); 
+    userProfile = await User_profile.findById(userProfile[0]._id);
     userProfile.following.push(req.body.followUserID);
 
     await userProfile.save();
@@ -166,41 +167,36 @@ exports.follow = async (req, res) => {
   }
 };
 
-
-
-
-
 exports.getFollowInfo = async (req, res) => {
   try {
+    const user_profile = await User_profile.find({ user_id: req.body.userID });
+    const following = user_profile[0].following.includes(req.body.followUserID);
+    const user_profile2 = await User_profile.find({
+      user_id: req.body.followUserID,
+    });
+    const followedby = user_profile2[0].following.includes(req.body.userID);
+    const followInfo = { following: following, followedby: followedby };
 
-    const user_profile = await User_profile.find({user_id:req.body.userID}); 
-    const following =user_profile[0].following.includes(req.body.followUserID) 
-    const user_profile2 = await User_profile.find({user_id:req.body.followUserID});
-    const followedby=user_profile2[0].following.includes(req.body.userID) ;
-    const followInfo = {following:following,followedby:followedby};
-   
     res.json(followInfo);
-    console.log(followInfo)
-    
+    console.log(followInfo);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
   }
 };
 
-
 exports.getInfo = async (req, res) => {
   try {
-    const user_profile = await User_profile.find({ user_id: req.body.userID }); 
+    const user_profile = await User_profile.find({ user_id: req.body.userID });
     const following =
-     ( user_profile[0].following === "undefined") ? 0 : user_profile[0].following.length;
+      user_profile[0].following === "undefined"
+        ? 0
+        : user_profile[0].following.length;
 
-    const followers = await User_profile.count(
-      { following: req.body.userID }
-    );
-    const projects = await Code_maker.count({ user_id: req.body.userID } ) 
-     
-    const info = { following,followers,projects };
+    const followers = await User_profile.count({ following: req.body.userID });
+    const projects = await Code_maker.count({ user_id: req.body.userID });
+
+    const info = { following, followers, projects };
 
     res.json(info);
     console.log(info);
@@ -210,18 +206,14 @@ exports.getInfo = async (req, res) => {
   }
 };
 
-
-
 exports.followUser = async (req, res) => {
   try {
-    const user_profile = await User_profile.findById(req.body.uniqueID); 
-    if (user_profile.following.includes(req.body.userID))
-    ;
-    else
-     user_profile.following.push(req.body.userID);
+    const user_profile = await User_profile.findById(req.body.uniqueID);
+    if (user_profile.following.includes(req.body.userID));
+    else user_profile.following.push(req.body.userID);
     await user_profile.save();
     res.json(user_profile);
-    console.log(req.body.userID)
+    console.log(req.body.userID);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -244,10 +236,6 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json(error);
   }
 };
-
- 
-
-
 
 exports.createCode = async (req, res) => {
   try {

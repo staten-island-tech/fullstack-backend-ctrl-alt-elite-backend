@@ -1,5 +1,5 @@
 const express = require("express"); //this file requires express
-const port = process.env.PORT || 5000; //use external server port OR local 3000
+const port = process.env.PORT || 5000; //use external server port OR local 5000
 const app = express(); //instantiate express
 require("./DB/mongoose"); //ensures mongoose connects and runs
 const routes = require("./routes/index");
