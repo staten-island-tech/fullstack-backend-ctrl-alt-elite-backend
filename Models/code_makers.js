@@ -31,7 +31,7 @@ const code_makerSchema = new mongoose.Schema(
     },
     project_likes: [
       {
-        type: String,
+        type: Array,
         trim: true,
       },
     ],
@@ -51,6 +51,7 @@ const code_makerSchema = new mongoose.Schema(
     },
     published_code: {
       type: code_components,
+      // type: code
       // default: {},
     },
     private_code: {
