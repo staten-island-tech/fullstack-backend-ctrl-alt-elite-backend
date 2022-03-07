@@ -61,7 +61,7 @@ exports.getProfile = async (req, res) => {
     
     const userProfile = await User_profile.find({ user_id: req.body.email });
     if(userProfile.length === 0)
-      throw ("Error : user already exists")
+      throw ("Error : user does not exists")
     
     const followers = await User_profile.count(
       { following: req.body.email }
@@ -206,8 +206,8 @@ exports.getInfo = async (req, res) => {
     console.log(info);
   } catch (error) {
     console.log(error);
-    res.status(500).json(error);
-  }
+    res.status(500).json(error); //determines if two users are following eacg ither
+  } 
 };
 
 
