@@ -62,7 +62,7 @@ exports.createProject = async (req, res) => {
     project.description = req.body.description;
     project.published_code = req.body.published_code;
     await project.save();
-    res.json(profile);
+    res.json(project);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);

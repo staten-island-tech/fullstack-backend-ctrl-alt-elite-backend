@@ -40,23 +40,16 @@ const code_makerSchema = new mongoose.Schema(
       trim: true,
       default: "none",
     },
-    project_status: {
-      type: String,
-      enum: ["Published", "Published with Pending Edits", "Private"],
-      default: "Private",
-    },
     dark_mode: {
+      type: Boolean,
+      default: true,
+    },
+    private: {
       type: Boolean,
       default: true,
     },
     published_code: {
       type: code_components,
-      // type: code
-      // default: {},
-    },
-    private_code: {
-      type: code_components,
-      default: {},
     },
   },
   { timestamps: true }
