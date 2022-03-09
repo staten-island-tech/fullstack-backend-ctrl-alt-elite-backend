@@ -179,7 +179,7 @@ exports.getFollowInfo = async (req, res) => {
     const followedby=user_profile2[0].following.includes(req.body.userID) ;
     const followInfo = {following:following,followedby:followedby};
    
-    res.json(followInfo);
+    res.json(followInfo); //differnet from name
     console.log(followInfo)
     
   } catch (error) {
@@ -263,7 +263,8 @@ exports.createCode = async (req, res) => {
 
 exports.searchProjects = async (req, res) => {
   try {
-    const code_maker = await Code_maker.find(req.body.project_title);
+    const code_maker = await Code_maker.find({project_title: req.body.project_title});
+  
     await code_maker.save();
     res.json(code_maker);
   } catch (error) {
