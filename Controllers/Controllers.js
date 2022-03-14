@@ -236,13 +236,15 @@ exports.createCode = async (req, res) => {
 
 exports.searchProjects = async (req, res) => {
   try {
-    const code_maker = await Code_maker.find({project_title: req.body.project_title});
-  
-    await code_maker.save();
+     
+    const code_maker = await Code_maker.find({
+      project_title: { $regex: req.body.projectTitle, $options: "si" }
+    });
     res.json(code_maker);
+    
   } catch (error) {
     console.log(error)
     res.status(500).json(error);
   }  
-  //why capital
+
 }
