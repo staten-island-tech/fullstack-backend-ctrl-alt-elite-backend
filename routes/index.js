@@ -3,10 +3,10 @@ const express = require("express");
 const router = new express.Router(); //instantiate express router
 const controller = require("../Controllers/Controllers");
 
-router.post("/", controller.homePage);
+router.get("/", controller.homePage);
 router.post("/createUser", controller.createUser);
-router.post("/createProject", controller.createProject);
 router.get("/getProfile", controller.getProfile);
+router.post("/createProject", controller.createProject);
 router.post("/add2", controller.createCode);
 // router.post("/updateFollowing", controller.updateFollowing);
 router.post("/profile", controller.updateProfile);

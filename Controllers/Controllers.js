@@ -1,37 +1,25 @@
 const res = require("express/lib/response");
 const { Mongoose, Schema } = require("mongoose");
-const User_profile = require("../Models/user_profiles"); // user profile model
-const Code_maker = require("../Models/code_makers");
-const { rawListeners } = require("../Models/user_profiles");
+const User_profile = require("../Models/profiles"); // user profile model
+const { rawListeners } = require("../Models/profiles");
 
 exports.homePage = async (req, res) => {
-  //basically just displaying all the data available for that user // the forntend will basically treat this as an API and take this information and use dot method to pull stuff out
+  //basically just displaying all the data available for that user // the frontend will basically treat this as an API and take this information and use dot method to pull stuff out
   try {
     const user_profile = await User_profile.find({ user_id: req.body.user_id });
-    console.log(req.body.user_id);
-    const code_maker = await Code_maker.aggregate([
+
+    /*
+    const code = await User_profile.aggregate([
       { $match: { user_id: "req.body.user_id" } },
       { $sort: { "private_code.updatedAt": -1 } },
       { $limit: 3 },
     ]);
+    */
 
-    res.json({ user_profile: user_profile, most_recent_projects: code_maker });
-  } catch (error) {
-    console.log(error);
-  }
-};
+    const code = await User_profile.aggregate();
+    console.log(code);
 
-exports.getProjects = async (req, res) => {
-  //  modify to use parameters to limit the list to most recent
-  try {
-    const codeMaker = await Code_maker.aggregate([
-      { $match: { user_id: req.body.userID } },
-      { $sort: { "private_code.updatedAt": -1 } },
-      // { $limit: 3 },
-    ]);
-
-    res.json({ projects: codeMaker });
-    console.log(codeMaker);
+    res.json({ user_profile: user_profile, most_recent_projects: code });
   } catch (error) {
     console.log(error);
   }
@@ -40,29 +28,13 @@ exports.getProjects = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const user_profile = new User_profile();
-    user_profile.user_id = req.body.email;
     user_profile.name = req.body.name;
+    user_profile.user_id = req.body.email;
     user_profile.given_name = req.body.given_name;
     user_profile.profile_pic = req.body.picture;
     user_profile.nickname = req.body.nickname;
-
     await user_profile.save();
     res.json(user_profile);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
-  }
-};
-
-exports.createProject = async (req, res) => {
-  try {
-    const project = new Code_maker();
-    project.project_title = req.body.project_title;
-    project.user_id = req.body.email;
-    project.description = req.body.description;
-    project.published_code = req.body.published_code;
-    await project.save();
-    res.json(project);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -73,9 +45,7 @@ exports.getProfile = async (req, res) => {
   try {
     const userProfile = await User_profile.find({ user_id: req.body.email });
     if (userProfile.length === 0) throw "Error : user already exists";
-
     const followers = await User_profile.count({ following: req.body.email });
-
     res.json({
       userProfile: userProfile[0],
       followers: followers,
@@ -83,6 +53,43 @@ exports.getProfile = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
+  }
+};
+
+exports.createProject = async (req, res) => {
+  try {
+    const user_profile = await User_profile.findById(req.body._id);
+    user_profile.projects.push({
+      project_title: req.body.project_title,
+      description: req.body.description,
+      published_code: {
+        html: req.body.html,
+        css: req.body.css,
+        js: req.body.js,
+      },
+    });
+    await user_profile.save();
+    res.json(user_profile);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
+
+exports.getProjects = async (req, res) => {
+  //  modify to use parameters to limit the list to most recent
+  try {
+    /// Still testing
+    const code = await User_profile.projects.aggregate([
+      { $match: { user_id: req.body.userID } },
+      { $sort: { "private_code.updatedAt": -1 } },
+      // { $limit: 3 },
+    ]);
+
+    res.json({ projects: code });
+    console.log(code);
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -223,7 +230,7 @@ exports.updateProfile = async (req, res) => {
   try {
     const user_profile = await User_profile.findById(req.body._id);
     user_profile.name = req.body.name;
-    user_profile.user_id = req.body.user_id;
+    user_profile.user_id = req.body.email;
     user_profile.profile_pic = req.body.profile_pic;
     user_profile.description = req.body.description;
     user_profile.nickname = req.body.nickname;
