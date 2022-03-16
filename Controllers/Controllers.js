@@ -1,4 +1,5 @@
 const res = require("express/lib/response");
+const { default: mongoose } = require("mongoose");
 const { Mongoose, Schema } = require("mongoose");
 const User_profile = require("../Models/profiles"); // user profile model
 const { rawListeners } = require("../Models/profiles");
@@ -6,19 +7,15 @@ const { rawListeners } = require("../Models/profiles");
 exports.homePage = async (req, res) => {
   //basically just displaying all the data available for that user // the frontend will basically treat this as an API and take this information and use dot method to pull stuff out
   try {
-    const user_profile = await User_profile.find({ user_id: req.body.user_id });
-
-    /*
+    const user_profile = await User_profile.find({ _id: req.body._id });
     const code = await User_profile.aggregate([
-      { $match: { user_id: "req.body.user_id" } },
-      { $sort: { "private_code.updatedAt": -1 } },
+      { $match: { _id: mongoose.Types.ObjectId(req.body._id) } },
+      { $unwind: "$projects" },
+      { $sort: { "projects.published_code.updatedAt": -1 } },
       { $limit: 3 },
+      { $group: { _id: "$_id", projects: { $push: "$projects" } } },
     ]);
-    */
-
-    const code = await User_profile.aggregate();
     console.log(code);
-
     res.json({ user_profile: user_profile, most_recent_projects: code });
   } catch (error) {
     console.log(error);
@@ -56,6 +53,24 @@ exports.getProfile = async (req, res) => {
   }
 };
 
+exports.updateProfile = async (req, res) => {
+  try {
+    const user_profile = await User_profile.findById(req.body._id);
+    user_profile.name = req.body.name;
+    user_profile.user_id = req.body.email;
+    user_profile.profile_pic = req.body.profile_pic;
+    user_profile.description = req.body.description;
+    user_profile.nickname = req.body.nickname;
+    user_profile.given_name = req.body.given_name;
+    user_profile.darkmode = req.body.darkmode;
+    await user_profile.save();
+    res.json(user_profile);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
+
 exports.createProject = async (req, res) => {
   try {
     const user_profile = await User_profile.findById(req.body._id);
@@ -79,15 +94,32 @@ exports.createProject = async (req, res) => {
 exports.getProjects = async (req, res) => {
   //  modify to use parameters to limit the list to most recent
   try {
-    /// Still testing
-    const code = await User_profile.projects.aggregate([
-      { $match: { user_id: req.body.userID } },
-      { $sort: { "private_code.updatedAt": -1 } },
-      // { $limit: 3 },
+    const code = await User_profile.aggregate([
+      { $match: { _id: mongoose.Types.ObjectId(req.body._id) } },
+      { $unwind: "$projects" },
+      { $sort: { "projects.published_code.updatedAt": -1 } },
+      { $limit: 1 },
+      { $group: { _id: "$_id", projects: { $push: "$projects" } } },
+    ]);
+    res.json({ projects: code });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.updateProject = async (req, res) => {
+  try {
+    const project = await User_profile.aggregate([
+      {
+        $unwind: "$projects",
+      },
+      {
+        $match: { "projects._id": req.body._id },
+      },
     ]);
 
-    res.json({ projects: code });
-    console.log(code);
+    console.log();
+    res.json(project);
   } catch (error) {
     console.log(error);
   }
@@ -103,7 +135,6 @@ exports.getFollowing = async (req, res) => {
       { user_id: { $in: following[0].following } },
       { name: 1, profile_pic: 1, user_id: 1 }
     );
-
     res.json({
       uniqueID: following[0]._id,
       user_id: following.user_id,
@@ -121,7 +152,6 @@ exports.getFollowers = async (req, res) => {
       { following: req.body.email },
       { name: 1, profile_pic: 1, user_id: 1 }
     );
-
     res.json({
       list: list,
     });
@@ -221,34 +251,6 @@ exports.followUser = async (req, res) => {
     await user_profile.save();
     res.json(user_profile);
     console.log(req.body.userID);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
-  }
-};
-exports.updateProfile = async (req, res) => {
-  try {
-    const user_profile = await User_profile.findById(req.body._id);
-    user_profile.name = req.body.name;
-    user_profile.user_id = req.body.email;
-    user_profile.profile_pic = req.body.profile_pic;
-    user_profile.description = req.body.description;
-    user_profile.nickname = req.body.nickname;
-    user_profile.given_name = req.body.given_name;
-    user_profile.darkmode = req.body.darkmode;
-    await user_profile.save();
-    res.json(user_profile);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
-  }
-};
-
-exports.createCode = async (req, res) => {
-  try {
-    const code_maker = new Code_maker(req.body);
-    await code_maker.save();
-    res.json(code_maker);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
