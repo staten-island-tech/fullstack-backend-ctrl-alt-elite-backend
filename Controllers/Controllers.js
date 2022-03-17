@@ -109,17 +109,35 @@ exports.getProjects = async (req, res) => {
 
 exports.updateProject = async (req, res) => {
   try {
+    /* 
     const project = await User_profile.aggregate([
       {
         $unwind: "$projects",
       },
       {
-        $match: { "projects._id": req.body._id },
+        $match: { "projects._id": mongoose.Types.ObjectId(req.body._id) },
       },
     ]);
-
-    console.log();
-    res.json(project);
+    const specify = project[0].projects;
+    specify.project_title.set(req.body.new_title);
+    specify.description.set(req.body.new_description);
+    specify.published_code.html.set(req.body.new_html);
+    specify.published_code.css = req.body.new_css;
+    specify.published_code.js = req.body.new_js;
+    await project.save();
+    */
+    const user_profile = await User_profile.findById(req.body._id).then(
+      (user) => {
+        const projects = user.projects.id(req.body.project_id);
+        projects.project_title = req.body.new_title;
+        projects.description = req.body.new_description;
+        projects.published_code.html = req.body.new_html;
+        projects.published_code.css = req.body.new_css;
+        projects.published_code.js = req.body.new_js;
+        return user.save();
+      }
+    );
+    res.json(user_profile);
   } catch (error) {
     console.log(error);
   }

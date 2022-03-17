@@ -7,7 +7,7 @@ router.get("/", controller.homePage);
 router.post("/createUser", controller.createUser);
 router.get("/getProfile", controller.getProfile);
 router.patch("/profile", controller.updateProfile);
-router.post("/newProject", controller.createProject);
+router.patch("/newProject", controller.createProject);
 router.get("/getProjects", controller.getProjects);
 router.patch("/project", controller.updateProject);
 // router.post("/updateFollowing", controller.updateFollowing);
