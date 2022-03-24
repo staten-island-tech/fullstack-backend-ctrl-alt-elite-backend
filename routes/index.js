@@ -10,6 +10,7 @@ router.patch("/profile", controller.updateProfile);
 router.patch("/newProject", controller.createProject);
 router.get("/getProjects", controller.getProjects);
 router.patch("/project", controller.updateProject);
+router.delete("/deleteProject", controller.deleteProject);
 // router.post("/updateFollowing", controller.updateFollowing);
 router.get("/getFollowing", controller.getFollowing);
 router.get("/getFollowers", controller.getFollowers);

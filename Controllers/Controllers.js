@@ -126,6 +126,18 @@ exports.updateProject = async (req, res) => {
   }
 };
 
+exports.deleteProject = async (req, res) => {
+  try {
+    const user_profile = await User_profile.find({
+      user_id: req.body.email,
+    }).updateOne({ $pull: { projects: { _id: req.body.project_id } } });
+    res.json(user_profile);
+    console.log();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 exports.getFollowing = async (req, res) => {
   try {
     const following = await User_profile.find(
