@@ -105,4 +105,4 @@ user_profileSchema.pre("save", function (next) {
   next();
 });
 
-module.exports = mongoose.model("profiles", user_profileSchema);
+module.exports = mongoose.model("profile", user_profileSchema);

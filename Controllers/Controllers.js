@@ -243,13 +243,17 @@ exports.getInfo = async (req, res) => {
         ? 0
         : user_profile[0].following.length;
 
+    const projects =
+      user_profile[0].projects === "undefined"
+        ? 0
+        : user_profile[0].projects.length;
+
     const followers = await User_profile.count({ following: req.body.userID });
-    const projects = await Code_maker.count({ user_id: req.body.userID });
+    // const projects = await Code_maker.count({ user_id: req.body.userID });
 
     const info = { following, followers, projects };
-
-    res.json(info);
     console.log(info);
+    res.json(info);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
