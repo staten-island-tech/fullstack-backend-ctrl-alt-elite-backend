@@ -98,10 +98,10 @@ exports.getProjects = async (req, res) => {
       { $match: { _id: mongoose.Types.ObjectId(req.body._id) } },
       { $unwind: "$projects" },
       { $sort: { "projects.published_code.updatedAt": -1 } },
-      { $limit: 1 },
+      { $limit: 3 },
       { $group: { _id: "$_id", projects: { $push: "$projects" } } },
     ]);
-    res.json({ projects: code });
+    res.json({ projects: code[0].projects });
   } catch (error) {
     console.log(error);
   }
