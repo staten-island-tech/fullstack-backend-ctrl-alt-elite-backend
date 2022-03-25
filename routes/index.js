@@ -6,7 +6,7 @@ const controller = require("../Controllers/Controllers");
 router.get("/", controller.homePage);
 router.post("/createUser", controller.createUser);
 router.post("/getProfile", controller.getProfile);
-router.patch("/profile", controller.updateProfile);
+router.post("/profile", controller.updateProfile);
 router.patch("/newProject", controller.createProject);
 router.get("/getProjects", controller.getProjects);
 router.patch("/project", controller.updateProject);
