@@ -12,12 +12,12 @@ router.get("/getProjects", controller.getProjects);
 router.patch("/project", controller.updateProject);
 router.delete("/deleteProject", controller.deleteProject);
 // router.post("/updateFollowing", controller.updateFollowing);
-router.get("/getFollowing", controller.getFollowing);
-router.get("/getFollowers", controller.getFollowers);
+router.post("/getFollowing", controller.getFollowing);
+router.post("/getFollowers", controller.getFollowers);
 router.post("/followUser", controller.followUser);
 
 router.post("/unFollow", controller.unFollow);
 router.post("/follow", controller.follow);
-router.get("/getFollowInfo", controller.getFollowInfo);
-router.get("/getInfo", controller.getInfo);
+router.post("/getFollowInfo", controller.getFollowInfo);
+router.post("/getInfo", controller.getInfo);
 module.exports = router;
