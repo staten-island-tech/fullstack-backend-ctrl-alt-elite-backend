@@ -41,11 +41,11 @@ exports.createUser = async (req, res) => {
 exports.getProfile = async (req, res) => {
   try {
     const userProfile = await User_profile.find({ user_id: req.body.email });
-    if (userProfile.length === 0) throw "Error : user already exists";
-    const followers = await User_profile.count({ following: req.body.email });
+    if (userProfile.length === 0) throw "Error : user does not exist";
+   // const followers = await User_profile.count({ following: req.body.email });
     res.json({
       userProfile: userProfile[0],
-      followers: followers,
+      // followers: followers,
     });
   } catch (error) {
     console.log(error);
@@ -56,13 +56,14 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const user_profile = await User_profile.findById(req.body._id);
+     
     user_profile.name = req.body.name;
-    user_profile.user_id = req.body.email;
     user_profile.profile_pic = req.body.profile_pic;
     user_profile.description = req.body.description;
     user_profile.nickname = req.body.nickname;
     user_profile.given_name = req.body.given_name;
     user_profile.darkmode = req.body.darkmode;
+    console.log("profile updated")
     await user_profile.save();
     res.json(user_profile);
   } catch (error) {
@@ -238,6 +239,7 @@ exports.getFollowInfo = async (req, res) => {
 exports.getInfo = async (req, res) => {
   try {
     const user_profile = await User_profile.find({ user_id: req.body.userID });
+    const name = user_profile[0].name;
     const following =
       user_profile[0].following === "undefined"
         ? 0
@@ -251,7 +253,7 @@ exports.getInfo = async (req, res) => {
     const followers = await User_profile.count({ following: req.body.userID });
     // const projects = await Code_maker.count({ user_id: req.body.userID });
 
-    const info = { following, followers, projects };
+    const info = { following, followers, projects,name };
     console.log(info);
     res.json(info);
   } catch (error) {
