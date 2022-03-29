@@ -15,7 +15,6 @@ exports.homePage = async (req, res) => {
       { $limit: 3 },
       { $group: { _id: "$_id", projects: { $push: "$projects" } } },
     ]);
-    console.log(code);
     res.json({ user_profile: user_profile, most_recent_projects: code });
   } catch (error) {
     console.log(error);
@@ -42,7 +41,7 @@ exports.getProfile = async (req, res) => {
   try {
     const userProfile = await User_profile.find({ user_id: req.body.email });
     if (userProfile.length === 0) throw "Error : user does not exist";
-   // const followers = await User_profile.count({ following: req.body.email });
+    // const followers = await User_profile.count({ following: req.body.email });
     res.json({
       userProfile: userProfile[0],
       // followers: followers,
@@ -56,14 +55,14 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const user_profile = await User_profile.findById(req.body._id);
-     
+
     user_profile.name = req.body.name;
     user_profile.profile_pic = req.body.profile_pic;
     user_profile.description = req.body.description;
     user_profile.nickname = req.body.nickname;
     user_profile.given_name = req.body.given_name;
     user_profile.darkmode = req.body.darkmode;
-    console.log("profile updated")
+    console.log("profile updated");
     await user_profile.save();
     res.json(user_profile);
   } catch (error) {
@@ -253,7 +252,7 @@ exports.getInfo = async (req, res) => {
     const followers = await User_profile.count({ following: req.body.userID });
     // const projects = await Code_maker.count({ user_id: req.body.userID });
 
-    const info = { following, followers, projects,name };
+    const info = { following, followers, projects, name };
     console.log(info);
     res.json(info);
   } catch (error) {
