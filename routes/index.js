@@ -15,7 +15,6 @@ router.delete("/deleteProject", controller.deleteProject);
 router.post("/getFollowing", controller.getFollowing);
 router.post("/getFollowers", controller.getFollowers);
 router.post("/followUser", controller.followUser);
-
 router.post("/unFollow", controller.unFollow);
 router.post("/follow", controller.follow);
 router.post("/getFollowInfo", controller.getFollowInfo);
