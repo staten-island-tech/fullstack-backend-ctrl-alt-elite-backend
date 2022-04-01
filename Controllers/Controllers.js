@@ -55,7 +55,6 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const user_profile = await User_profile.findById(req.body._id);
-
     user_profile.name = req.body.name;
     user_profile.profile_pic = req.body.profile_pic;
     user_profile.description = req.body.description;
@@ -94,14 +93,15 @@ exports.createProject = async (req, res) => {
 exports.getProjects = async (req, res) => {
   //  modify to use parameters to limit the list to most recent
   try {
+    const user_profile = await User_profile.find({ _id: req.body._id });
     const code = await User_profile.aggregate([
       { $match: { _id: mongoose.Types.ObjectId(req.body._id) } },
       { $unwind: "$projects" },
       { $sort: { "projects.published_code.updatedAt": -1 } },
-      { $limit: 3 },
+      { $limit: 5 },
       { $group: { _id: "$_id", projects: { $push: "$projects" } } },
     ]);
-    res.json({ projects: code[0].projects });
+    res.json({ most_recent_projects: code });
   } catch (error) {
     console.log(error);
   }
@@ -195,7 +195,6 @@ exports.unFollow = async (req, res) => {
     );
     await userProfile.save();
     res.json(userProfile);
-    console.log(userProfile);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
