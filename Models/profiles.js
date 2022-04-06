@@ -89,7 +89,7 @@ const user_profileSchema = new mongoose.Schema(
     following: [{ type: String, trim: true }],
     dark_mode: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     projects: [code_makerComponents],
   },

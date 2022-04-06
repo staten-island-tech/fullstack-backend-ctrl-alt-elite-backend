@@ -117,6 +117,7 @@ exports.updateProject = async (req, res) => {
         projects.published_code.html = req.body.new_html;
         projects.published_code.css = req.body.new_css;
         projects.published_code.js = req.body.new_js;
+        projects.private = req.body.private_boolean;
         return user.save();
       }
     );
