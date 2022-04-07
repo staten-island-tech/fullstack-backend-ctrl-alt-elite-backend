@@ -9,6 +9,7 @@ router.post("/getProfile", controller.getProfile);
 router.post("/profile", controller.updateProfile);
 router.patch("/newProject", controller.createProject);
 router.post("/getProjects", controller.getProjects);
+router.post("/getFollowingProjects", controller.displayFollowingProjects);
 router.patch("/project", controller.updateProject);
 router.delete("/deleteProject", controller.deleteProject);
 // router.post("/updateFollowing", controller.updateFollowing);
