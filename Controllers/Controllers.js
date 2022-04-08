@@ -299,3 +299,12 @@ exports.followUser = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+// exports.searchProjects = async(req, res) => {
+//   try{
+//     const user_profiles = await User_profiles.findbyId(req.body.mongoID);
+
+//   }catch{
+ 
+//   }
+// }
