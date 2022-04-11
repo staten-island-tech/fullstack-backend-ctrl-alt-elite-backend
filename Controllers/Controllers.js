@@ -300,11 +300,17 @@ exports.followUser = async (req, res) => {
   }
 };
 
-// exports.searchProjects = async(req, res) => {
-//   try{
-//     const user_profiles = await User_profiles.findbyId(req.body.mongoID);
+exports.searchProjects = async (req, res) => {
+  try {
+     
+    const code_maker = await Code_maker.find({
+      project_title: { $regex: req.body.projectTitle, $options: "si" }
+    });
+    res.json(code_maker);
+    
+  } catch (error) {
+    console.log(error)
+    res.status(500).json(error);
+  }  
 
-//   }catch{
- 
-//   }
-// }
+}
