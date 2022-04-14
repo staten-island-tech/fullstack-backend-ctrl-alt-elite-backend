@@ -309,8 +309,9 @@ exports.searchProjects = async (req, res) => {
     res.json(code_maker);
     
   } catch (error) {
-    console.log(error)
-    res.status(500).json(error);
+  console.log(error);
+  res.status(500).json(error) 
+
   }  
 
 }
