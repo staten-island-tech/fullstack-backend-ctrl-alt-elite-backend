@@ -113,19 +113,18 @@ exports.displayFollowingProjects = async (req, res) => {
     const following = [];
     const allFollowingProjects = [];
     following.push(...user_profile[0].following);
-    for (const user of following) {
-      const otherProfile = await User_profile.find({ user_id: user });
-      const user_mongo_id = otherProfile[0]._id;
-      const code = await User_profile.aggregate([
-        { $match: { _id: mongoose.Types.ObjectId(user_mongo_id) } },
-        { $unwind: "$projects" },
-        { $sort: { "projects.published_code.updatedAt": -1 } },
-        { $limit: 10 },
-        { $group: { _id: "$_id", projects: { $push: "$projects" } } },
-      ]);
-      allFollowingProjects.push(code);
-    }
-
+    const code = await User_profile.aggregate([
+      { $unwind: "$projects" },
+      { $sort: { "projects.updatedAt": -1 } },
+      { $limit: 100 },
+    ]);
+    code.forEach((object) => {
+      following.forEach((user_id) => {
+        if (object.user_id === user_id) {
+          allFollowingProjects.push(object);
+        }
+      });
+    });
     res.json(allFollowingProjects);
   } catch (error) {
     console.log(error);
