@@ -298,3 +298,18 @@ exports.followUser = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+exports.searchProjects = async (req, res) => {
+  try {
+     
+    const code_maker = await Code_maker.find({
+      project_title: { $regex: req.body.projectTitle, $options: "si" }
+    });
+    res.json(code_maker);
+    
+  } catch (error) {
+    console.log(error)
+    res.status(500).json(error);
+  }  
+
+}
