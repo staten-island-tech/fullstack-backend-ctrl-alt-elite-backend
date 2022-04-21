@@ -264,6 +264,9 @@ exports.getInfo = async (req, res) => {
   try {
     const user_profile = await User_profile.find({ user_id: req.body.userID });
     const name = user_profile[0].name;
+    const profilePic = user_profile[0].profile_pic
+    const userID =user_profile[0].user_id
+    const mongoID = user_profile[0]._id
     const following =
       user_profile[0].following === "undefined"
         ? 0
@@ -275,10 +278,10 @@ exports.getInfo = async (req, res) => {
         : user_profile[0].projects.length;
 
     const followers = await User_profile.count({ following: req.body.userID });
-    // const projects = await Code_maker.count({ user_id: req.body.userID });
+    
 
-    const info = { following, followers, projects, name };
-    console.log(info);
+    const info = { following, followers, projects, name, profilePic,mongoID,userID};
+     
     res.json(info);
   } catch (error) {
     console.log(error);
@@ -303,10 +306,27 @@ exports.followUser = async (req, res) => {
 exports.searchProjects = async (req, res) => {
   try {
      
-    const code_maker = await Code_maker.find({
-      project_title: { $regex: req.body.projectTitle, $options: "si" }
-    });
-    res.json(code_maker);
+    const projects = await User_profile.find(
+      {
+        projects: {
+          $elemMatch: {
+            project_title: { $regex: req.body.projectTitle, $options: "si" },
+          },
+        },
+      },
+      {
+        name: 1,
+        profile_pic: 1,
+        user_id: 1,
+        projects: {
+          $elemMatch: {
+            project_title: { $regex: req.body.projectTitle, $options: "si" },
+          },
+        },
+      }
+    ); ;
+
+    res.json(projects);
     
   } catch (error) {
   console.log(error);
