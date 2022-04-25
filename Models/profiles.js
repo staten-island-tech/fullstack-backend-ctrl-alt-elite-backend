@@ -81,6 +81,8 @@ const user_profileSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+  
+    
     description: {
       type: String,
       trim: true,
