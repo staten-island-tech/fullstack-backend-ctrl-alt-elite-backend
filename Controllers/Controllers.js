@@ -120,12 +120,24 @@ exports.displayFollowingProjects = async (req, res) => {
     ]);
     code.forEach((object) => {
       following.forEach((user_id) => {
-        if (object.user_id === user_id) {
+        if (object.user_id === user_id && object.projects.private === false) {
           allFollowingProjects.push(object);
         }
       });
     });
     res.json(allFollowingProjects);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.displayTrendingProjects = async (req, res) => {
+  try {
+    const code = await User_profile.aggregate([
+      { $unwind: "$projects" },
+      { $limit: 10 },
+    ]);
+    res.json(code);
   } catch (error) {
     console.log(error);
   }
@@ -263,9 +275,9 @@ exports.getInfo = async (req, res) => {
   try {
     const user_profile = await User_profile.find({ user_id: req.body.userID });
     const name = user_profile[0].name;
-    const profilePic = user_profile[0].profile_pic
-    const userID =user_profile[0].user_id
-    const mongoID = user_profile[0]._id
+    const profilePic = user_profile[0].profile_pic;
+    const userID = user_profile[0].user_id;
+    const mongoID = user_profile[0]._id;
     const following =
       user_profile[0].following === "undefined"
         ? 0
@@ -277,10 +289,17 @@ exports.getInfo = async (req, res) => {
         : user_profile[0].projects.length;
 
     const followers = await User_profile.count({ following: req.body.userID });
-    
 
-    const info = { following, followers, projects, name, profilePic,mongoID,userID};
-     
+    const info = {
+      following,
+      followers,
+      projects,
+      name,
+      profilePic,
+      mongoID,
+      userID,
+    };
+
     res.json(info);
   } catch (error) {
     console.log(error);
@@ -304,7 +323,6 @@ exports.followUser = async (req, res) => {
 
 exports.searchProjects = async (req, res) => {
   try {
-     
     const projects = await User_profile.find(
       {
         projects: {
@@ -323,14 +341,11 @@ exports.searchProjects = async (req, res) => {
           },
         },
       }
-    ); ;
+    );
 
     res.json(projects);
-    
   } catch (error) {
-  console.log(error);
-  res.status(500).json(error) 
-
-  }  
-
-}
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
