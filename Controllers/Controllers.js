@@ -211,6 +211,39 @@ exports.getFollowers = async (req, res) => {
   }
 };
 
+exports.addLike = async (req, res) => {
+  try {
+    true_project = [];
+    const project = await User_profile.find(
+      {
+        projects: {
+          $elemMatch: {
+            project_title: { $regex: req.body.projectTitle, $options: "si" },
+          },
+        },
+      },
+      {
+        name: 1,
+        profile_pic: 1,
+        user_id: 1,
+        projects: {
+          $elemMatch: {
+            project_title: { $regex: req.body.projectTitle, $options: "si" },
+          },
+        },
+      }
+    );
+    project.forEach((obj) => {
+      if (obj.name === req.body.name) {
+        true_project.push(obj);
+      }
+    });
+    res.json(true_project);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // exports.updateFollowing = async (req, res) => {
 //   try {
 //     const user_profile = await User_profile.findById(req.body.uniqueID);  r
