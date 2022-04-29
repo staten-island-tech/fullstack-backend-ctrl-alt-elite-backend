@@ -32,7 +32,7 @@ const code_makerComponents = new mongoose.Schema(
     },
     project_likes: [
       {
-        type: Array,
+        type: Object,
         trim: true,
       },
     ],
@@ -81,8 +81,6 @@ const user_profileSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
-  
-    
     description: {
       type: String,
       trim: true,

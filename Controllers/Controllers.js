@@ -133,10 +133,15 @@ exports.displayFollowingProjects = async (req, res) => {
 
 exports.displayTrendingProjects = async (req, res) => {
   try {
+    ordered = [];
     const code = await User_profile.aggregate([
       { $unwind: "$projects" },
-      { $limit: 10 },
+      { $sort: { "projects.updatedAt": -1 } },
+      { $limit: 100 },
     ]);
+    code.sort(function (a, b) {
+      return b.projects.project_likes.length - a.projects.project_likes.length;
+    });
     res.json(code);
   } catch (error) {
     console.log(error);
@@ -213,32 +218,15 @@ exports.getFollowers = async (req, res) => {
 
 exports.addLike = async (req, res) => {
   try {
-    true_project = [];
-    const project = await User_profile.find(
-      {
-        projects: {
-          $elemMatch: {
-            project_title: { $regex: req.body.projectTitle, $options: "si" },
-          },
-        },
-      },
-      {
-        name: 1,
-        profile_pic: 1,
-        user_id: 1,
-        projects: {
-          $elemMatch: {
-            project_title: { $regex: req.body.projectTitle, $options: "si" },
-          },
-        },
-      }
-    );
-    project.forEach((obj) => {
-      if (obj.name === req.body.name) {
-        true_project.push(obj);
+    let userProfile = await User_profile.find({ user_id: req.body.userID });
+    userProfile = await User_profile.findById(userProfile[0]._id);
+    userProfile.projects.forEach((project) => {
+      if (project.project_title === req.body.projectTitle) {
+        project.project_likes.push(req.body.followUserID);
       }
     });
-    res.json(true_project);
+    await userProfile.save();
+    res.json(userProfile);
   } catch (error) {
     console.log(error);
   }
