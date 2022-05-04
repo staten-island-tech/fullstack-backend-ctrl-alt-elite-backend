@@ -14,6 +14,7 @@ router.get("/getTrendingProjects", controller.displayTrendingProjects);
 router.patch("/project", controller.updateProject);
 router.delete("/deleteProject", controller.deleteProject);
 router.post("/addLike", controller.addLike);
+router.post("/removeLike", controller.removeLike);
 // router.post("/updateFollowing", controller.updateFollowing);
 router.post("/getFollowing", controller.getFollowing);
 router.post("/getFollowers", controller.getFollowers);

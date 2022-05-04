@@ -232,6 +232,26 @@ exports.addLike = async (req, res) => {
   }
 };
 
+exports.removeLike = async (req, res) => {
+  try {
+    let userProfile = await User_profile.find({ user_id: req.body.userID });
+    userProfile = await User_profile.findById(userProfile[0]._id);
+    userProfile.projects.forEach((project) => {
+      if (project.project_title === req.body.projectTitle) {
+        project.project_likes.forEach((e, index) => {
+          if (e === req.body.followUserID) {
+            project.project_likes.splice(index);
+          }
+        });
+      }
+    });
+    await userProfile.save();
+    res.json(userProfile);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // exports.updateFollowing = async (req, res) => {
 //   try {
 //     const user_profile = await User_profile.findById(req.body.uniqueID);  r
