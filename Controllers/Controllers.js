@@ -43,7 +43,7 @@ exports.getProfile = async (req, res) => {
     if (userProfile.length === 0) throw "Error : user does not exist";
     // const followers = await User_profile.count({ following: req.body.email });
     res.json({
-      profile: userProfile[0],
+      userProfile: userProfile[0],
       // followers: followers,
     });
   } catch (error) {
