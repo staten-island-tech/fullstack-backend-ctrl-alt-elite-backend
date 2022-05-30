@@ -61,7 +61,6 @@ exports.updateProfile = async (req, res) => {
     user_profile.nickname = req.body.nickname;
     user_profile.given_name = req.body.given_name;
     user_profile.darkmode = req.body.darkmode;
-    console.log("profile updated");
     await user_profile.save();
     res.json(user_profile);
   } catch (error) {
@@ -305,8 +304,7 @@ exports.getFollowInfo = async (req, res) => {
     const followInfo = { following: following, followedby: followedby };
 
     res.json(followInfo);
-    console.log(followInfo);
-  } catch (error) {
+    } catch (error) {
     console.log(error);
     res.status(500).json(error);
   }
