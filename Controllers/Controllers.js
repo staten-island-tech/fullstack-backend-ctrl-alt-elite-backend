@@ -1,9 +1,35 @@
 const res = require("express/lib/response");
+
 const { default: mongoose } = require("mongoose");
 const { Mongoose, Schema } = require("mongoose");
 const User_profile = require("../Models/profiles"); // user profile model
 const { rawListeners } = require("../Models/profiles");
+require("dotenv").config({ path: "variables.env" });
+const jwt = require("jsonwebtoken");
+// use (express.json);
 
+exports.authenticateToken = async (req, res, next) => {
+  
+  const token = req.headers["authorization"];
+
+  
+  //
+  if (token == null) return res.sendStatus(401);
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    //req.user =user
+    next();
+  });
+};
+
+exports.login = async (req, res) => {
+  const username = req.body.username;
+  const user = { name: username };
+  const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+ 
+
+  res.json(accessToken);
+};
 exports.homePage = async (req, res) => {
   //basically just displaying all the data available for that user // the frontend will basically treat this as an API and take this information and use dot method to pull stuff out
   try {
@@ -304,7 +330,7 @@ exports.getFollowInfo = async (req, res) => {
     const followInfo = { following: following, followedby: followedby };
 
     res.json(followInfo);
-    } catch (error) {
+  } catch (error) {
     console.log(error);
     res.status(500).json(error);
   }
@@ -362,27 +388,18 @@ exports.followUser = async (req, res) => {
 
 exports.searchProjects = async (req, res) => {
   try {
-    const projects = await User_profile.find(
+    const projects = await User_profile.aggregate([
+      { $unwind: "$projects" },
       {
-        projects: {
-          $elemMatch: {
-            project_title: { $regex: req.body.projectTitle, $options: "si" },
-          },
+        $match: {
+         'projects.project_title': { $regex: req.body.projectTitle, $options: "si" },
         },
-      },
-      {
-        name: 1,
-        profile_pic: 1,
-        user_id: 1,
-        projects: {
-          $elemMatch: {
-            project_title: { $regex: req.body.projectTitle, $options: "si" },
-          },
-        },
-      }
-    );
+     },
+      { $limit: 100 },
+    ]);
 
     res.json(projects);
+   
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
