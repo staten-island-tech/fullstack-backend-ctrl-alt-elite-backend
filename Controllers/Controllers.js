@@ -50,6 +50,7 @@ exports.homePage = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const user_profile = new User_profile();
+    console.log(JSON.stringify( req.body))
     user_profile.name = req.body.name;
     user_profile.user_id = req.body.email;
     user_profile.given_name = req.body.given_name;
@@ -66,7 +67,12 @@ exports.createUser = async (req, res) => {
 exports.getProfile = async (req, res) => {
   try {
     const userProfile = await User_profile.find({ user_id: req.body.email });
-    if (userProfile.length === 0) throw "Error : user does not exist";
+    if (userProfile.length === 0) 
+    { 
+      const error = new Error ( "Error : user does not exist");
+      error.code =999
+      throw error 
+    } 
     // const followers = await User_profile.count({ following: req.body.email });
     res.json({
       userProfile: userProfile[0],
@@ -74,7 +80,7 @@ exports.getProfile = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json(error);
+    res.status(999).json(error);
   }
 };
 
@@ -118,17 +124,22 @@ exports.createProject = async (req, res) => {
 exports.getProjects = async (req, res) => {
   //  modify to use parameters to limit the list to most recent
   try {
-    const user_profile = await User_profile.find({ _id: req.body._id });
+  //  const user_profile = await User_profile.find({ _id: req.body._id });
     const code = await User_profile.aggregate([
       { $match: { _id: mongoose.Types.ObjectId(req.body._id) } },
       { $unwind: "$projects" },
-      { $sort: { "projects.published_code.updatedAt": -1 } },
+      // { $sort: { "projects.published_code.updatedAt": -1 } },
       { $limit: 100 },
       { $group: { _id: "$_id", projects: { $push: "$projects" } } },
     ]);
+   
+
     res.json({ projects: code[0].projects });
+    
+
   } catch (error) {
-    console.log(error);
+   // console.log(error);
+    res.json({ projects: [] });
   }
 };
 

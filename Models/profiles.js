@@ -92,6 +92,7 @@ const user_profileSchema = new mongoose.Schema(
       default: false,
     },
     projects: [code_makerComponents],
+       
   },
   { timestamps: true }
 );
