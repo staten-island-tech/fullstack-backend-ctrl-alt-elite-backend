@@ -1,4 +1,3 @@
-require.paths.push('/usr/local/lib/node_modules');
 const express = require("express"); //this file requires express
 const port = process.env.PORT || 5000; //use external server port OR local 5000
 const app = express(); //instantiate express
