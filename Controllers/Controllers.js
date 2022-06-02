@@ -9,10 +9,8 @@ const jwt = require("jsonwebtoken");
 // use (express.json);
 
 exports.authenticateToken = async (req, res, next) => {
-  
   const token = req.headers["authorization"];
 
-  
   //
   if (token == null) return res.sendStatus(401);
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
@@ -26,7 +24,6 @@ exports.login = async (req, res) => {
   const username = req.body.username;
   const user = { name: username };
   const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
- 
 
   res.json(accessToken);
 };
@@ -51,7 +48,7 @@ exports.login = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const user_profile = new User_profile();
-    console.log(JSON.stringify( req.body))
+    console.log(JSON.stringify(req.body));
     user_profile.name = req.body.name;
     user_profile.user_id = req.body.email;
     user_profile.given_name = req.body.given_name;
@@ -68,12 +65,11 @@ exports.createUser = async (req, res) => {
 exports.getProfile = async (req, res) => {
   try {
     const userProfile = await User_profile.find({ user_id: req.body.email });
-    if (userProfile.length === 0) 
-    { 
-      const error = new Error ( "Error : user does not exist");
-      error.code =999
-      throw error 
-    } 
+    if (userProfile.length === 0) {
+      const error = new Error("Error : user does not exist");
+      error.code = 999;
+      throw error;
+    }
     // const followers = await User_profile.count({ following: req.body.email });
     res.json({
       userProfile: userProfile[0],
@@ -81,10 +77,8 @@ exports.getProfile = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    if (error.code ===999)
-      res.status(999).json(error);
-    else 
-      res.status(500).json(error);
+    if (error.code === 999) res.status(999).json(error);
+    else res.status(500).json(error);
   }
 };
 
@@ -128,29 +122,24 @@ exports.createProject = async (req, res) => {
 exports.getProjects = async (req, res) => {
   //  modify to use parameters to limit the list to most recent
   try {
-  //  const user_profile = await User_profile.find({ _id: req.body._id });
-    
+    //  const user_profile = await User_profile.find({ _id: req.body._id });
+
     const code = await User_profile.aggregate([
       { $match: { _id: mongoose.Types.ObjectId(req.body._id) } },
       { $unwind: "$projects" },
-      // { $sort: { "projects.published_code.updatedAt": -1 } },
+      { $sort: { "projects.published_code.updatedAt": -1 } },
       { $limit: 100 },
       { $group: { _id: "$_id", projects: { $push: "$projects" } } },
     ]);
-    
-   
-    res.json({ projects: code[0].projects });
-    
 
+    res.json({ projects: code[0].projects });
   } catch (error) {
-   // console.log(error);
+    // console.log(error);
     res.json({ projects: [] });
   }
-
 };
 
-
- exports.displayFollowingProjects = async (req, res) => {
+exports.displayFollowingProjects = async (req, res) => {
   try {
     const user_profile = await User_profile.find({ _id: req.body._id });
     const following = [];
@@ -257,7 +246,6 @@ exports.getFollowers = async (req, res) => {
     res.json({
       list: list,
     });
-    
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -302,8 +290,6 @@ exports.removeLike = async (req, res) => {
   }
 };
 
-
-
 exports.unFollow = async (req, res) => {
   try {
     let userProfile = await User_profile.find({ user_id: req.body.userID });
@@ -345,7 +331,6 @@ exports.getFollowInfo = async (req, res) => {
     const followInfo = { following: following, followedby: followedby };
 
     res.json(followInfo);
-
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -408,14 +393,16 @@ exports.searchProjects = async (req, res) => {
       { $unwind: "$projects" },
       {
         $match: {
-         'projects.project_title': { $regex: req.body.projectTitle, $options: "si" },
+          "projects.project_title": {
+            $regex: req.body.projectTitle,
+            $options: "si",
+          },
         },
-     },
+      },
       { $limit: 100 },
     ]);
 
     res.json(projects);
-   
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
