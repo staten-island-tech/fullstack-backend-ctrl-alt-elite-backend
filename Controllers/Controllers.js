@@ -146,9 +146,11 @@ exports.getProjects = async (req, res) => {
    // console.log(error);
     res.json({ projects: [] });
   }
+
 };
 
-exports.displayFollowingProjects = async (req, res) => {
+
+ exports.displayFollowingProjects = async (req, res) => {
   try {
     const user_profile = await User_profile.find({ _id: req.body._id });
     const following = [];
