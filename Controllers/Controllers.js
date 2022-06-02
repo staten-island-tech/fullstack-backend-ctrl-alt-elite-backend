@@ -30,22 +30,23 @@ exports.login = async (req, res) => {
 
   res.json(accessToken);
 };
-exports.homePage = async (req, res) => {
-  //basically just displaying all the data available for that user // the frontend will basically treat this as an API and take this information and use dot method to pull stuff out
-  try {
-    const user_profile = await User_profile.find({ _id: req.body._id });
-    const code = await User_profile.aggregate([
-      { $match: { _id: mongoose.Types.ObjectId(req.body._id) } },
-      { $unwind: "$projects" },
-      { $sort: { "projects.published_code.updatedAt": -1 } },
-      { $limit: 3 },
-      { $group: { _id: "$_id", projects: { $push: "$projects" } } },
-    ]);
-    res.json({ user_profile: user_profile, most_recent_projects: code });
-  } catch (error) {
-    console.log(error);
-  }
-};
+// exports.homePage = async (req, res) => {
+//   //basically just displaying all the data available for that user // the frontend will basically treat this as an API and take this information and use dot method to pull stuff out
+//   try {
+//     const user_profile = await User_profile.find({ _id: req.body._id });
+//     const code = await User_profile.aggregate([
+//       { $match: { _id: mongoose.Types.ObjectId(req.body._id) } },
+//       { $unwind: "$projects" },
+//       { $sort: { "projects.published_code.updatedAt": -1 } },
+//       { $limit: 3 },
+//       { $group: { _id: "$_id", projects: { $push: "$projects" } } },
+//     ]);
+//     res.json({ user_profile: user_profile, most_recent_projects: code });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json(error);
+//   }
+// };
 
 exports.createUser = async (req, res) => {
   try {
@@ -80,7 +81,10 @@ exports.getProfile = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(999).json(error);
+    if (error.code ===999)
+      res.status(999).json(error);
+    else 
+      res.status(500).json(error);
   }
 };
 
@@ -125,6 +129,7 @@ exports.getProjects = async (req, res) => {
   //  modify to use parameters to limit the list to most recent
   try {
   //  const user_profile = await User_profile.find({ _id: req.body._id });
+    
     const code = await User_profile.aggregate([
       { $match: { _id: mongoose.Types.ObjectId(req.body._id) } },
       { $unwind: "$projects" },
@@ -132,8 +137,8 @@ exports.getProjects = async (req, res) => {
       { $limit: 100 },
       { $group: { _id: "$_id", projects: { $push: "$projects" } } },
     ]);
+    
    
-
     res.json({ projects: code[0].projects });
     
 
@@ -164,6 +169,7 @@ exports.displayFollowingProjects = async (req, res) => {
     res.json(allFollowingProjects);
   } catch (error) {
     console.log(error);
+    res.status(500).json(error);
   }
 };
 
@@ -181,6 +187,7 @@ exports.displayTrendingProjects = async (req, res) => {
     res.json(code);
   } catch (error) {
     console.log(error);
+    res.status(500).json(error);
   }
 };
 
@@ -201,6 +208,7 @@ exports.updateProject = async (req, res) => {
     res.json(user_profile);
   } catch (error) {
     console.log(error);
+    res.status(500).json(error);
   }
 };
 
@@ -213,6 +221,7 @@ exports.deleteProject = async (req, res) => {
     console.log();
   } catch (error) {
     console.log(error);
+    res.status(500).json(error);
   }
 };
 
@@ -246,6 +255,7 @@ exports.getFollowers = async (req, res) => {
     res.json({
       list: list,
     });
+    
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -265,6 +275,7 @@ exports.addLike = async (req, res) => {
     res.json(userProfile);
   } catch (error) {
     console.log(error);
+    res.status(500).json(error);
   }
 };
 
@@ -285,20 +296,11 @@ exports.removeLike = async (req, res) => {
     res.json(userProfile);
   } catch (error) {
     console.log(error);
+    res.status(500).json(error);
   }
 };
 
-// exports.updateFollowing = async (req, res) => {
-//   try {
-//     const user_profile = await User_profile.findById(req.body.uniqueID);  r
-//     user_profile.following = req.body.list;
-//     await user_profile.save();
-//     res.json(user_profile);
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json(error);
-//   }
-// };
+
 
 exports.unFollow = async (req, res) => {
   try {
@@ -341,6 +343,7 @@ exports.getFollowInfo = async (req, res) => {
     const followInfo = { following: following, followedby: followedby };
 
     res.json(followInfo);
+
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
