@@ -121,16 +121,13 @@ exports.createProject = async (req, res) => {
 exports.getProjects = async (req, res) => {
   //  modify to use parameters to limit the list to most recent
   try {
-    //  const user_profile = await User_profile.find({ _id: req.body._id });
-
     const code = await User_profile.aggregate([
       { $match: { _id: mongoose.Types.ObjectId(req.body._id) } },
       { $unwind: "$projects" },
-      { $sort: { "projects.published_code.updatedAt": -1 } },
+      { $sort: { "projects.updatedAt": -1 } },
       { $limit: 100 },
       { $group: { _id: "$_id", projects: { $push: "$projects" } } },
     ]);
-
     res.json({ projects: code[0].projects });
   } catch (error) {
     // console.log(error);

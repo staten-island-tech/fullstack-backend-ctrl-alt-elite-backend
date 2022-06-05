@@ -7,8 +7,11 @@ const controller = require("../Controllers/Controllers");
 router.post("/createUser", controller.authenticateToken, controller.createUser);
 router.post("/getProfile", controller.authenticateToken, controller.getProfile);
 router.post("/profile", controller.authenticateToken, controller.updateProfile);
-router.patch("/newProject", controller.authenticateToken,controller.createProject);
-
+router.patch(
+  "/newProject",
+  controller.authenticateToken,
+  controller.createProject
+);
 router.post(
   "/getProjects",
   controller.authenticateToken,
