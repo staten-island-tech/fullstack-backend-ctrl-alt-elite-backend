@@ -75,9 +75,11 @@ exports.getProfile = async (req, res) => {
       // followers: followers,
     });
   } catch (error) {
+    // if (error.code === 999) 
+    //     ;
+    // else 
     console.log(error);
-    if (error.code === 999) res.status(999).json(error);
-    else res.status(500).json(error);
+     res.status(500).json(error);
   }
 };
 
