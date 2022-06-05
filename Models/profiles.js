@@ -36,14 +36,6 @@ const code_makerComponents = new mongoose.Schema(
         trim: true,
       },
     ],
-    dark_mode: {
-      type: Boolean,
-      default: true,
-    },
-    private: {
-      type: Boolean,
-      default: true,
-    },
     published_code: code_components,
   },
   { timestamps: true }

@@ -140,15 +140,20 @@ exports.displayFollowingProjects = async (req, res) => {
     const user_profile = await User_profile.find({ _id: req.body._id });
     const following = [];
     const allFollowingProjects = [];
+    // Gets all the people you are following
     following.push(...user_profile[0].following);
+    // Gets all the projects
     const code = await User_profile.aggregate([
       { $unwind: "$projects" },
       { $sort: { "projects.updatedAt": -1 } },
       { $limit: 100 },
     ]);
+    // For each individual project
     code.forEach((object) => {
-      following.forEach((user_id) => {
-        if (object.user_id === user_id && object.projects.private === false) {
+      // For each user that you are following
+      following.forEach((user) => {
+        // If for the individual project's user_id is one of the users you're following
+        if (object.user_id === user) {
           allFollowingProjects.push(object);
         }
       });
@@ -188,7 +193,6 @@ exports.updateProject = async (req, res) => {
         projects.published_code.html = req.body.new_html;
         projects.published_code.css = req.body.new_css;
         projects.published_code.js = req.body.new_js;
-        projects.private = req.body.private_boolean;
         return user.save();
       }
     );
