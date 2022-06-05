@@ -5,15 +5,15 @@ const code_components = new mongoose.Schema(
   {
     html: {
       type: String,
-      default: "",
+      default: "none",
     },
     css: {
       type: String,
-      default: "",
+      default: "none",
     },
     js: {
       type: String,
-      default: "",
+      default: "none",
     },
   },
   { timestamps: true }
@@ -28,7 +28,7 @@ const code_makerComponents = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
-      default: "",
+      default: "none",
     },
     project_likes: [
       {
@@ -92,6 +92,7 @@ const user_profileSchema = new mongoose.Schema(
       default: false,
     },
     projects: [code_makerComponents],
+       
   },
   { timestamps: true }
 );
