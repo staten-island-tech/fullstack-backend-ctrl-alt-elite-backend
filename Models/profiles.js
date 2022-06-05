@@ -59,7 +59,7 @@ const user_profileSchema = new mongoose.Schema(
     user_id: {
       type: String,
       trim: true,
-      rquired: "Please enter your email",
+      required: "Please enter your email",
     },
     given_name: {
       type: String,
