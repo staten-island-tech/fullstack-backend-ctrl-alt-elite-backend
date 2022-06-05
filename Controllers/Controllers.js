@@ -7,7 +7,6 @@ const { rawListeners } = require("../Models/profiles");
 require("dotenv").config({ path: "variables.env" });
 const jwt = require("jsonwebtoken");
 
-
 exports.authenticateToken = async (req, res, next) => {
   const token = req.headers["authorization"];
 
@@ -47,13 +46,14 @@ exports.login = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const user_profile = new User_profile();
-    
+
     user_profile.name = req.body.name;
     user_profile.user_id = req.body.email;
     user_profile.given_name = req.body.given_name;
     user_profile.profile_pic = req.body.picture;
     user_profile.nickname = req.body.nickname;
-    const user_profile2= await User_profile.create(user_profile);
+    const user_profile2 = await User_profile.create(user_profile);
+
     res.json(user_profile2);
   } catch (error) {
     console.log(error);
@@ -312,7 +312,6 @@ exports.follow = async (req, res) => {
 
     await userProfile.save();
     res.json(userProfile);
-    
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -379,7 +378,6 @@ exports.followUser = async (req, res) => {
     else user_profile.following.push(req.body.userID);
     await user_profile.save();
     res.json(user_profile);
-   
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
